@@ -1,8 +1,10 @@
 package com.mj147.tictactoeai.service;
 
 import com.mj147.tictactoeai.domain.Board;
+import com.mj147.tictactoeai.domain.Square;
 import com.mj147.tictactoeai.exception.EntityDoesNotExistException;
 import com.mj147.tictactoeai.repository.BoardRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -11,17 +13,15 @@ import java.util.List;
 @Service
 public class BoardServiceImpl implements BoardService {
 
-    private final BoardRepository boardRepository;
-
-    public BoardServiceImpl(BoardRepository boardRepository) {
-        this.boardRepository = boardRepository;
-    }
+    @Autowired
+    BoardRepository boardRepository;
+    @Autowired
+    SquareService squareService;
 
     @Override
-    public Board createBoard() {
-        Board board = new Board();
-        board.setSquares(createClearBoardSquares(board.getSize()));
+    public Board createBoard(Board board) {
         boardRepository.save(board);
+        board.setSquares(createSquares(board));
 
         return board;
     }
@@ -29,40 +29,41 @@ public class BoardServiceImpl implements BoardService {
     @Override
     public Board getBoard(Long id) {
         return boardRepository.findById(id)
-                .orElseThrow(() -> new EntityDoesNotExistException("Board id: " + id + "not found"));
+                .orElseThrow(() -> new EntityDoesNotExistException("Board id: " + id + " not found"));
     }
 
     @Override
     public Board updateBoard(Board board) {
         boardRepository.save(board);
-        if (checkIfWon(board.getSquares()) != 0) {
-            //win
-        }
 
         return board;
     }
 
-    private List<Integer> createClearBoardSquares(int boardSize) {
-        List<Integer> squares = new ArrayList<>();
-        for (int i = 0; i < boardSize; i++) {
-            squares.add(i, 0);
+    private List<Square> createSquares(Board board) {
+        List<Square> squares = new ArrayList<>();
+        for (int i = 0; i < board.getSize(); i++) {
+            Square square = new Square();
+            square.setBoard(board);
+            square.setNumberInBoard(i);
+            squares.add(i, square);
+            squareService.createSquare(square);
         }
         return squares;
     }
 
-    private Integer checkIfWon (List<Integer> squares) {
+    private Integer checkIfWon (List<Square> squares) {
         int result = checkFromCenterSquare(squares);
         return (result != 0) ? result : checkBoardOutline(squares);
     }
 
     //check if someone won starting from center square
-    private Integer checkFromCenterSquare(List<Integer> squares) {
-        int centerSquare = squares.get(4);
-        if (centerSquare != 0) {
+    private Integer checkFromCenterSquare(List<Square> squares) {
+        int centerSquareValue = squares.get(4).getValue();
+        if (centerSquareValue != 0) {
             for (int i = 0; i < 4 ; i++) {
-                if (squares.get(i) == centerSquare &&
-                    squares.get(i) == checkOppositeSquare(squares.get(i))) {
-                    return centerSquare;
+                if (squares.get(i).getValue() == centerSquareValue &&
+                    squares.get(i).getValue() == checkOppositeSquare(squares.get(i))) {
+                    return centerSquareValue;
                 }
             }
         }
@@ -71,18 +72,18 @@ public class BoardServiceImpl implements BoardService {
 
     //check if someone won in board outline
     //renumbering of squares for easier finding
-    private Integer checkBoardOutline(List<Integer> squares) {
-        List<Integer> squaresInNewOrder = changeOrderOfSquares(squares);
+    private Integer checkBoardOutline(List<Square> squares) {
+        List<Square> squaresInNewOrder = changeOrderOfSquares(squares);
         int counter = 0;
         for (int i = 1; i < squaresInNewOrder.size(); i++) {
-            if (squaresInNewOrder.get(i) != 0 &&
+            if (squaresInNewOrder.get(i).getValue() != 0 &&
                     squaresInNewOrder.get(i) == squaresInNewOrder.get(i - 1)) {
                 counter++;
             } else {
                 counter = 0;
             }
             if (counter == 2) {
-                return squaresInNewOrder.get(i);
+                return squaresInNewOrder.get(i).getValue();
             }
             if (i % 2 == 0) {
                 counter = 0;
@@ -91,8 +92,8 @@ public class BoardServiceImpl implements BoardService {
         return 0;
     }
 
-    private List<Integer> changeOrderOfSquares(List<Integer> squares) {
-        List<Integer> squaresInNewOrder = new ArrayList<>();
+    private List<Square> changeOrderOfSquares(List<Square> squares) {
+        List<Square> squaresInNewOrder = new ArrayList<>();
         squaresInNewOrder.add(0, squares.get(0));
         squaresInNewOrder.add(1, squares.get(1));
         squaresInNewOrder.add(2, squares.get(2));
@@ -107,8 +108,8 @@ public class BoardServiceImpl implements BoardService {
 
     }
 
-    private Integer checkOppositeSquare(Integer square) {
-        return 8 - square;
+    private Integer checkOppositeSquare(Square square) {
+        return 8 - square.getValue();
     }
 
 }
