@@ -1,6 +1,7 @@
 package com.mj147.tictactoeai.domain;
 
 import lombok.Data;
+import lombok.ToString;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -14,10 +15,14 @@ public class Board {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private final Integer size = 9;
-    @ElementCollection(targetClass=Integer.class)
-    private List<Integer> squares;
+    @OneToOne
+    @MapsId
+    @ToString.Exclude
+    private Game game;
+    @OneToMany(mappedBy = "board")
+    private List<Square> squares;
 
-    public List<Integer> getSquares() {
+    public List<Square> getSquares() {
         if (squares == null) {
             squares = new ArrayList<>();
         }

@@ -3,6 +3,7 @@ package com.mj147.tictactoeai.controller;
 import com.mj147.tictactoeai.controller.dto.BoardDto;
 import com.mj147.tictactoeai.domain.Board;
 import com.mj147.tictactoeai.service.BoardService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -10,17 +11,8 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/board")
 public class BoardController {
 
-    private final BoardService boardService;
-
-    public BoardController(BoardService boardService) {
-        this.boardService = boardService;
-    }
-
-    @PostMapping("/create")
-    public ResponseEntity<BoardDto> createBoard() {
-        BoardDto boardDto = new BoardDto(boardService.createBoard());
-        return ResponseEntity.ok(boardDto);
-    }
+    @Autowired
+    BoardService boardService;
 
     @GetMapping("/{id}")
     public ResponseEntity<BoardDto> getBoard(@PathVariable Long id) {

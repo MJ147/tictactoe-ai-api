@@ -6,9 +6,9 @@ import java.util.List;
 
 public interface BoardService {
 
-    Board createBoard();
-
     Board updateBoard(Board board);
+
+    Board createBoard(Board board);
 
     Board getBoard(Long id);
 }
