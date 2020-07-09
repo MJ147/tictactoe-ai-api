@@ -33,10 +33,19 @@ public class BoardServiceImpl implements BoardService {
     }
 
     @Override
-    public Board updateBoard(Board board) {
-        boardRepository.save(board);
+    public Board resetBoard(Long boardId) {
+        Board board = getBoard(boardId);
+        resetSquares(board);
 
         return board;
+    }
+
+    private void resetSquares(Board board) {
+        for (int i = 0; i < board.getSize(); i++) {
+            Square square = board.getSquares().get(i);
+            square.setValue(0);
+            squareService.updateSquare(square);
+        }
     }
 
     private List<Square> createSquares(Board board) {

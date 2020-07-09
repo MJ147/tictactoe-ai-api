@@ -6,7 +6,7 @@ import java.util.List;
 
 public interface BoardService {
 
-    Board updateBoard(Board board);
+    Board resetBoard(Long boardId);
 
     Board createBoard(Board board);
 

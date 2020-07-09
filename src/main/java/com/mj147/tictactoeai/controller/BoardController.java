@@ -14,15 +14,18 @@ public class BoardController {
     @Autowired
     BoardService boardService;
 
+    @CrossOrigin(origins = "http://localhost:4200")
     @GetMapping("/{id}")
     public ResponseEntity<BoardDto> getBoard(@PathVariable Long id) {
         BoardDto boardDto = new BoardDto(boardService.getBoard(id));
         return  ResponseEntity.ok(boardDto);
     }
 
-    @PutMapping("/update")
-    public ResponseEntity<BoardDto> updateBoard(@RequestBody Board board) {
-        BoardDto boardDto = new BoardDto(boardService.updateBoard(board));
+    @CrossOrigin(origins = "http://localhost:4200")
+    @PutMapping("/reset/{boardId}")
+    public ResponseEntity<BoardDto> resetBoard(@PathVariable Long boardId) {
+        BoardDto boardDto = new BoardDto(boardService.resetBoard(boardId));
         return ResponseEntity.ok(boardDto);
     }
+
 }
