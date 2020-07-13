@@ -1,7 +1,6 @@
 package com.mj147.tictactoeai.controller;
 
 import com.mj147.tictactoeai.controller.dto.SquareDto;
-import com.mj147.tictactoeai.domain.Square;
 import com.mj147.tictactoeai.service.PlayerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

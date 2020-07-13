@@ -15,11 +15,11 @@ public class Board {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private final Integer size = 9;
-    @OneToOne
+    @OneToOne()
     @MapsId
     @ToString.Exclude
     private Game game;
-    @OneToMany(mappedBy = "board")
+    @OneToMany(mappedBy = "board", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<Square> squares;
 
     public List<Square> getSquares() {
