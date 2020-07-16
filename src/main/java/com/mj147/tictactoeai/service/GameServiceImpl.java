@@ -1,9 +1,6 @@
 package com.mj147.tictactoeai.service;
 
-import com.mj147.tictactoeai.domain.Board;
-import com.mj147.tictactoeai.domain.Game;
-import com.mj147.tictactoeai.domain.Player;
-import com.mj147.tictactoeai.domain.Square;
+import com.mj147.tictactoeai.domain.*;
 import com.mj147.tictactoeai.exception.EntityDoesNotExistException;
 import com.mj147.tictactoeai.repository.GameRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,14 +20,16 @@ public class GameServiceImpl implements GameService{
     @Autowired
     PlayerService playerService;
     @Autowired
+    AiPlayerService aiPlayerService;
+    @Autowired
     SquareService squareService;
 
     @Override
     public Game createGame() {
         Game game = new Game();
         gameRepository.save(game);
-        Player player1 = playerService.createPlayer();
-        Player player2 = playerService.createPlayer();
+        Player player1 = playerService.createPlayer(1);
+        AiPlayer player2 = aiPlayerService.createAiPlayer(2);
         game.setPlayers(Arrays.asList(player1, player2));
         Board board = new Board();
         board.setGame(game);
@@ -50,6 +49,27 @@ public class GameServiceImpl implements GameService{
     public void removeGame(Long id) {
         getGame(id);
         gameRepository.removeById(id);
+    }
+
+    @Override
+    public Board makeMove(Long squareId) {
+        Square square = squareService.findById(squareId);
+        squareService.isSquareFree(square);
+        Player player = playerService.whoseTurn(square);
+        square.setValue(player.getValue());
+        squareService.updateSquare(square);
+        Player player2 = playerService.whoseTurn(square);
+        Board board = square.getBoard();
+        if (player2 instanceof AiPlayer && checkIfWon(board.getId()) == 0){
+            Square square2 = aiPlayerService.makeMove(board, (AiPlayer)player2);
+            square2.setValue(player2.getValue());
+            squareService.updateSquare(square);
+        }
+        if (checkIfWon(board.getId()) != 0) {
+            aiPlayerService.updateFactors(player2, checkIfWon(board.getId()));
+        }
+
+        return square.getBoard();
     }
 
     @Override

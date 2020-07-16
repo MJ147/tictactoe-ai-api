@@ -15,4 +15,5 @@ public interface SquareService {
 
     Integer countAllByBoardIdAndAndValue(Long boardId, Integer value);
 
+    void isSquareFree(Square square);
 }

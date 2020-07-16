@@ -1,13 +1,11 @@
 package com.mj147.tictactoeai.service;
 
 import com.mj147.tictactoeai.domain.Square;
-
 import com.mj147.tictactoeai.exception.EntityDoesNotExistException;
+import com.mj147.tictactoeai.exception.SquareIsAlreadyTakenException;
 import com.mj147.tictactoeai.repository.SquareRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 public class SquareServiceImpl implements SquareService {
@@ -37,4 +35,10 @@ public class SquareServiceImpl implements SquareService {
         return squareRepository.countAllByBoardIdAndValue(boardId, value);
     }
 
+    @Override
+    public void isSquareFree(Square square) {
+        if (square.getValue() != 0) {
+            throw new SquareIsAlreadyTakenException("Square: " + square.getNumberInBoard() + " is already taken");
+        }
+    }
 }

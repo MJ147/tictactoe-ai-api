@@ -1,5 +1,6 @@
 package com.mj147.tictactoeai.controller;
 
+import com.mj147.tictactoeai.controller.dto.BoardDto;
 import com.mj147.tictactoeai.controller.dto.GameDto;
 import com.mj147.tictactoeai.controller.dto.SquareDto;
 import com.mj147.tictactoeai.service.GameService;
@@ -45,6 +46,14 @@ public class GameController {
         Integer winStatus = gameService.checkIfWon(boardId);
 
         return ResponseEntity.ok(winStatus);
+    }
+
+    @CrossOrigin(origins = "http://localhost:4200")
+    @PutMapping("/move/{squareId}")
+    public ResponseEntity<BoardDto> makeMove(@PathVariable Long squareId) {
+        BoardDto boardDto = new BoardDto(gameService.makeMove(squareId));
+
+        return ResponseEntity.ok(boardDto);
     }
 
 }

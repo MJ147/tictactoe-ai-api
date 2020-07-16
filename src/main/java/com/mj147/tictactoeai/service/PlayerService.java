@@ -1,11 +1,12 @@
 package com.mj147.tictactoeai.service;
 
+import com.mj147.tictactoeai.domain.Board;
 import com.mj147.tictactoeai.domain.Player;
 import com.mj147.tictactoeai.domain.Square;
 
 public interface PlayerService {
 
-    Player createPlayer();
+    Player createPlayer(int squareValue);
 
-    Square makeMove(Long squareId);
+    Player whoseTurn(Square square);
 }

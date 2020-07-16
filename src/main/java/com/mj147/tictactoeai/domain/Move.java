@@ -4,12 +4,14 @@ import lombok.Data;
 
 import javax.persistence.*;
 
-@Data
 @Entity
-public class Player {
+@Data
+public class Move {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private Integer value;
-
+    private String boardSymbol;
+    private Integer squareNumber;
+    private Long factor = 0L;
+    private Boolean update;
 }
