@@ -21,11 +21,5 @@ public class BoardController {
         return  ResponseEntity.ok(boardDto);
     }
 
-    @CrossOrigin(origins = "http://localhost:4200")
-    @PutMapping("/reset/{boardId}")
-    public ResponseEntity<BoardDto> resetBoard(@PathVariable Long boardId) {
-        BoardDto boardDto = new BoardDto(boardService.resetBoard(boardId));
-        return ResponseEntity.ok(boardDto);
-    }
 
 }

@@ -14,7 +14,11 @@ public interface GameService {
 
     void removeGame(Long id);
 
+    Board resetBoard(Long boardId);
+
     Board makeMove(Long squareId);
 
     Integer checkIfWon (Long boardId);
+
+    void learnAi(Long gameId, Long numberOfGames);
 }
