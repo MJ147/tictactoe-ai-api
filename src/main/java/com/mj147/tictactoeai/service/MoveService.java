@@ -6,11 +6,11 @@ import java.util.List;
 
 public interface MoveService {
 
-    Move findMove(String symbol);
+    List<Move> findMovesWithBiggestFactor(String symbol);
 
-    Move createMove(String symbol, Integer number);
+    List<Move> findMovesByBoardSymbol(String symbol);
 
-    Move changeUpdateStatus(Long moveId, boolean isUpdate);
+    Move createMove(String symbol, Integer number, Integer moveValue);
 
     Move update(Move move);
 

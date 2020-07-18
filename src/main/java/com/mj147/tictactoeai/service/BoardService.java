@@ -11,4 +11,6 @@ public interface BoardService {
     Board createBoard(Board board);
 
     Board getBoard(Long id);
+
+    Integer checkBoard(Board board);
 }

@@ -49,11 +49,26 @@ public class GameController {
     }
 
     @CrossOrigin(origins = "http://localhost:4200")
+    @PutMapping("/reset/{boardId}")
+    public ResponseEntity<BoardDto> resetBoard(@PathVariable Long boardId) {
+        BoardDto boardDto = new BoardDto(gameService.resetBoard(boardId));
+        return ResponseEntity.ok(boardDto);
+    }
+
+    @CrossOrigin(origins = "http://localhost:4200")
     @PutMapping("/move/{squareId}")
     public ResponseEntity<BoardDto> makeMove(@PathVariable Long squareId) {
         BoardDto boardDto = new BoardDto(gameService.makeMove(squareId));
 
         return ResponseEntity.ok(boardDto);
+    }
+
+    @CrossOrigin(origins = "http://localhost:4200")
+    @PutMapping("/learn")
+    public HttpStatus learnAi(@RequestParam Long gameId, @RequestParam Long numberOfGames) {
+        System.out.println(gameId + " " + numberOfGames);
+        gameService.learnAi(gameId, numberOfGames);
+        return HttpStatus.OK;
     }
 
 }

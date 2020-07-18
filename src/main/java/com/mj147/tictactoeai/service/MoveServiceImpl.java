@@ -14,28 +14,25 @@ public class MoveServiceImpl implements MoveService {
     @Autowired
     MoveRepository moveRepository;
 
-
     @Override
-    public Move findMove(String symbol) {
-        return moveRepository.findMax(symbol);
+    public List<Move> findMovesWithBiggestFactor(String symbol) {
+        return moveRepository.findMovesWithBiggestFactor(symbol);
     }
 
     @Override
-    public Move createMove(String symbol, Integer number) {
+    public List<Move> findMovesByBoardSymbol(String symbol){
+        return moveRepository.findMovesByBoardSymbol(symbol);
+    }
+
+    @Override
+    public Move createMove(String symbol, Integer number, Integer moveValue) {
        Move move = new Move();
        move.setBoardSymbol(symbol);
        move.setSquareNumber(number);
+       move.setMoveValue(moveValue);
        move.setUpdate(false);
 
        return moveRepository.save(move);
-    }
-
-    @Override
-    public Move changeUpdateStatus(Long moveId, boolean isUpdate){
-        Move move = moveRepository.findById(moveId)
-                .orElseThrow( () -> new EntityDoesNotExistException("Move id: " + moveId + " not found"));
-        move.setUpdate(isUpdate);
-        return moveRepository.save(move);
     }
 
     @Override

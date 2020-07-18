@@ -32,55 +32,63 @@ public class AiPlayerServiceImpl implements AiPlayerService{
     }
 
     @Override
-    public Square makeMove(Board board, AiPlayer player2) {
+    public Square makeMove(Board board, AiPlayer player) {
         Square square;
         Move move;
         String boardSymbol = convertBoardToString(board);
-        move = randomMove(board, boardSymbol, player2);
+        move = randomMove(board, boardSymbol, player);
         move = (move != null) ? move : findBestMove(boardSymbol);
         square = board.getSquares().get(move.getSquareNumber());
-        System.out.println(move);
         return square;
     }
 
     @Override
-    public void updateFactors(Player player2, Integer checkIfWon) {
-        int changeFactor = convertResultToPoints(checkIfWon, player2.getValue());
+    public void updateFactors(Player player, Integer checkIfWon) {
+        int changeFactor;
         List<Move> moves = moveService.findAllByUpdate(false);
         for (Move move : moves) {
-            System.out.println("------------>>>>" + move.getFactor() + changeFactor);
-            move.setFactor(move.getFactor() + changeFactor);
+            changeFactor = convertResultToPoints(checkIfWon, move.getMoveValue());
+            Long newFactor = move.getFactor() + changeFactor;
+            move.setFactor(newFactor < 20 ? newFactor : 20);
             move.setUpdate(true);
             moveService.update(move);
         }
     }
 
-    private int convertResultToPoints(Integer checkIfWon, Integer playerValue) {
-        if (checkIfWon == 3) return 1;
-        if (checkIfWon == 0) return 0;
+    private int convertResultToPoints(Integer checkIfWon, Integer moveValue) {
+        if (checkIfWon == 3) return 0;
         if (checkIfWon == 1 || checkIfWon == 2) {
-            if (checkIfWon.equals(playerValue)) {
-                return 3;
+            if (checkIfWon == moveValue) {
+                return 1;
             } else {
                 return -1;
             }
         }
-        return -100;
+        return 0;
     }
 
-
     private Move findBestMove(String boardSymbol) {
-        Move move = moveService.findMove(boardSymbol);
-        moveService.changeUpdateStatus(move.getId(), false);
+        List<Move> moves;
+        Move move;
+        if ("000000000".equals(boardSymbol)) {
+            moves = moveService.findMovesByBoardSymbol(boardSymbol);
+            move = moves.get(random.nextInt(moves.size()));
+        } else {
+            moves = moveService.findMovesWithBiggestFactor(boardSymbol);
+            move = moves.get(random.nextInt(moves.size()));
+        }
+        System.out.println(move);
+        move.setUpdate(false);
+        moveService.update(move);
         return move;
     }
 
-    public Move randomMove(Board board, String boardSymbol, AiPlayer player2) {
+    public Move randomMove(Board board, String boardSymbol, AiPlayer player) {
         List<Square> squares = board.getSquares();
         int randomSquareNumber = random.nextInt(9);
         int squareNumber = randomSquareNumber;
         while(squares.get(squareNumber).getValue() != 0 ||
-              !isSquareNumberIsAvailableForNewMove(boardSymbol, squareNumber)) {
+              !isMoveInBase(boardSymbol, squareNumber)) {
             if (squareNumber < 8) {
                 squareNumber++;
             } else {
@@ -90,13 +98,11 @@ public class AiPlayerServiceImpl implements AiPlayerService{
                 return null;
             }
         }
-        Move move = moveService.createMove(boardSymbol, squareNumber);
-        player2.setMoves(move);
-
+        Move move = moveService.createMove(boardSymbol, squareNumber, player.getValue());
         return move;
     }
 
-    public Boolean isSquareNumberIsAvailableForNewMove(String boardSymbol, Integer squareNumber) {
+    public Boolean isMoveInBase(String boardSymbol, Integer squareNumber) {
         return !moveService.existsMoveByBoardSymbolAndSquareNumber(boardSymbol, squareNumber);
     }
 

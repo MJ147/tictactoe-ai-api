@@ -5,13 +5,15 @@ import com.mj147.tictactoeai.exception.EntityDoesNotExistException;
 import com.mj147.tictactoeai.repository.GameRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @Service
-public class GameServiceImpl implements GameService{
+public class GameServiceImpl implements GameService {
 
     @Autowired
     GameRepository gameRepository;
@@ -23,6 +25,8 @@ public class GameServiceImpl implements GameService{
     AiPlayerService aiPlayerService;
     @Autowired
     SquareService squareService;
+    @Autowired
+    MoveService moveService;
 
     @Override
     public Game createGame() {
@@ -42,13 +46,24 @@ public class GameServiceImpl implements GameService{
     @Override
     public Game getGame(Long id) {
         return gameRepository.findById(id)
-                .orElseThrow( () -> new EntityDoesNotExistException("Game id: " + id + " not found"));
+                .orElseThrow(() -> new EntityDoesNotExistException("Game id: " + id + " not found"));
     }
 
     @Override
     public void removeGame(Long id) {
         getGame(id);
         gameRepository.removeById(id);
+    }
+
+    @Override
+    public Board resetBoard(Long boardId) {
+        Board board = boardService.resetBoard(boardId);
+        List<Move> moves = moveService.findAllByUpdate(false);
+        for (Move move : moves) {
+            move.setUpdate(true);
+            moveService.update(move);
+        }
+        return board;
     }
 
     @Override
@@ -60,8 +75,8 @@ public class GameServiceImpl implements GameService{
         squareService.updateSquare(square);
         Player player2 = playerService.whoseTurn(square);
         Board board = square.getBoard();
-        if (player2 instanceof AiPlayer && checkIfWon(board.getId()) == 0){
-            Square square2 = aiPlayerService.makeMove(board, (AiPlayer)player2);
+        if (player2 instanceof AiPlayer && checkIfWon(board.getId()) == 0) {
+            Square square2 = aiPlayerService.makeMove(board, (AiPlayer) player2);
             square2.setValue(player2.getValue());
             squareService.updateSquare(square);
         }
@@ -74,68 +89,44 @@ public class GameServiceImpl implements GameService{
 
     @Override
     public Integer checkIfWon(Long boardId) {
-        List<Square> squares = boardService.getBoard(boardId).getSquares();
-        int result = checkFromCenterSquare(squares);
-        result = (result != 0) ? result : checkBoardOutline(squares);
-        return (result == 0 && squareService.countAllByBoardIdAndAndValue(boardId,0) == 0) ? 3 : result;
+        Board board = boardService.getBoard(boardId);
+        return boardService.checkBoard(board);
     }
 
-    //check if someone won starting from center square
-    private Integer checkFromCenterSquare(List<Square> squares) {
-        int centerSquareValue = squares.get(4).getValue();
-        if (centerSquareValue != 0) {
-            for (int i = 0; i < 4 ; i++) {
-                if (squares.get(i).getValue() == centerSquareValue &&
-                        squares.get(i).getValue() == convertToOppositeSquare(squares.get(i)).getValue()) {
-                    return centerSquareValue;
-                }
-            }
+    @Override
+    public void learnAi(Long gameId, Long numberOfGames) {
+        Game game = this.getGame(gameId);
+        AiPlayer player = (AiPlayer) game.getPlayers().stream()
+                .filter(p -> p instanceof AiPlayer)
+                .findFirst()
+                .orElseThrow(NoSuchElementException::new);
+        Board board = game.getBoard();
+        boardService.resetBoard(board.getId());
+        simulateGames(board, player, numberOfGames);
+    }
+
+    private void simulateGames(Board board, AiPlayer player, Long numberOfGames) {
+        for (int i = 0; i < numberOfGames; i++) {
+            simulateOneGame(board, player);
         }
-        return 0;
     }
 
-    //check if someone won in board outline
-    //renumbering of squares for easier finding
-    private Integer checkBoardOutline(List<Square> squares) {
-        List<Square> squaresInNewOrder = changeOrderOfSquares(squares);
-        int counter = 0;
-        for (int i = 1; i < squaresInNewOrder.size(); i++) {
-            if (squaresInNewOrder.get(i).getValue() != 0 &&
-                    squaresInNewOrder.get(i).getValue() == squaresInNewOrder.get(i - 1).getValue()) {
-                counter++;
-            } else {
-                counter = 0;
-            }
-            if (counter == 2) {
-                return squaresInNewOrder.get(i).getValue();
-            }
-            if (i % 2 == 0) {
-                counter = 0;
-            }
+    @Transactional
+    public void simulateOneGame(Board board, AiPlayer player) {
+        while (checkIfWon(board.getId()) == 0) {
+
+            simulateOneMove(board, player);
         }
-        return 0;
+        player.setValue(2);
+        aiPlayerService.updateFactors(player, checkIfWon(board.getId()));
+        boardService.resetBoard(board.getId());
     }
 
-    private List<Square> changeOrderOfSquares(List<Square> squares) {
-        List<Square> squaresInNewOrder = new ArrayList<>();
-        squaresInNewOrder.add(0, squares.get(0));
-        squaresInNewOrder.add(1, squares.get(1));
-        squaresInNewOrder.add(2, squares.get(2));
-        squaresInNewOrder.add(3, squares.get(5));
-        squaresInNewOrder.add(4, squares.get(8));
-        squaresInNewOrder.add(5, squares.get(7));
-        squaresInNewOrder.add(6, squares.get(6));
-        squaresInNewOrder.add(7, squares.get(3));
-        squaresInNewOrder.add(8, squares.get(0));
-
-        return squaresInNewOrder;
-
-    }
-
-    private Square convertToOppositeSquare(Square square) {
-        int squareNumber = 8 - square.getNumberInBoard();
-        Square oppositeSquare = square.getBoard().getSquares().get(squareNumber);
-        return oppositeSquare;
+    private void simulateOneMove(Board board, AiPlayer player) {
+        player.setValue(player.getValue() == 1 ? 2 : 1);
+        Square square = aiPlayerService.makeMove(board, player);
+        square.setValue(player.getValue());
+        squareService.updateSquare(square);
     }
 
 }

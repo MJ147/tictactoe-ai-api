@@ -1,9 +1,6 @@
 package com.mj147.tictactoeai.service;
 
-import com.mj147.tictactoeai.domain.Board;
 import com.mj147.tictactoeai.domain.Square;
-
-import java.util.List;
 
 public interface SquareService {
 

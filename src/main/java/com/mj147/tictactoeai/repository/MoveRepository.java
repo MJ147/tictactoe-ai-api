@@ -13,9 +13,11 @@ public interface MoveRepository extends CrudRepository<Move, Long> {
 
     @Query(value = "SELECT * FROM Move " +
             "WHERE board_symbol = (:symbol) " +
-            "AND factor = (SELECT max(factor) FROM Move WHERE board_symbol = (:symbol)) " +
-            "LIMIT 1", nativeQuery=true)
-    Move findMax(@Param("symbol") String symbol);
+            "AND factor = (SELECT max(factor) FROM Move WHERE board_symbol = (:symbol)) ",
+            nativeQuery=true)
+    List<Move> findMovesWithBiggestFactor(@Param("symbol") String symbol);
+
+    List<Move> findMovesByBoardSymbol(String symbol);
 
     Boolean existsMoveByBoardSymbolAndSquareNumber(String symbol, Integer squareNumber);
 
