@@ -9,6 +9,8 @@ public interface AiPlayerService {
 
     AiPlayer createAiPlayer(int squareValue);
 
+    Square makeRandomMove(Board board, AiPlayer player);
+
     Square makeMove(Board board, AiPlayer player2);
 
     void updateFactors(Player player2, Integer checkIfWon);
