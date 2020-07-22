@@ -9,6 +9,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.Duration;
+import java.time.Instant;
+import java.time.LocalTime;
+import java.time.Period;
+
 @RestController
 @RequestMapping("/game")
 public class GameController {
@@ -66,8 +71,11 @@ public class GameController {
     @CrossOrigin(origins = "http://localhost:4200")
     @PutMapping("/learn")
     public HttpStatus learnAi(@RequestParam Long gameId, @RequestParam Long numberOfGames) {
-        System.out.println(gameId + " " + numberOfGames);
+        Instant start = Instant.now();
         gameService.learnAi(gameId, numberOfGames);
+        Instant end = Instant.now();
+        Duration timeElapsed = Duration.between(start, end);
+        System.out.println("Time taken: " + timeElapsed);
         return HttpStatus.OK;
     }
 

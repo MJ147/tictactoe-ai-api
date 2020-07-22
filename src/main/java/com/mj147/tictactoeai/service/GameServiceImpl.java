@@ -78,7 +78,7 @@ public class GameServiceImpl implements GameService {
         if (player2 instanceof AiPlayer && checkIfWon(board.getId()) == 0) {
             Square square2 = aiPlayerService.makeMove(board, (AiPlayer) player2);
             square2.setValue(player2.getValue());
-            squareService.updateSquare(square);
+            squareService.updateSquare(square2);
         }
         if (checkIfWon(board.getId()) != 0) {
             aiPlayerService.updateFactors(player2, checkIfWon(board.getId()));
@@ -114,7 +114,10 @@ public class GameServiceImpl implements GameService {
     @Transactional
     public void simulateOneGame(Board board, AiPlayer player) {
         while (checkIfWon(board.getId()) == 0) {
-
+            simulateRandomMove(board, player);
+            if (checkIfWon(board.getId()) != 0) {
+                break;
+            }
             simulateOneMove(board, player);
         }
         player.setValue(2);
@@ -125,6 +128,13 @@ public class GameServiceImpl implements GameService {
     private void simulateOneMove(Board board, AiPlayer player) {
         player.setValue(player.getValue() == 1 ? 2 : 1);
         Square square = aiPlayerService.makeMove(board, player);
+        square.setValue(player.getValue());
+        squareService.updateSquare(square);
+    }
+
+    private void simulateRandomMove(Board board, AiPlayer player) {
+        player.setValue(player.getValue() == 1 ? 2 : 1);
+        Square square = aiPlayerService.makeRandomMove(board, player);
         square.setValue(player.getValue());
         squareService.updateSquare(square);
     }

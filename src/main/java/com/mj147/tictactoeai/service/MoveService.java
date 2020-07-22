@@ -3,18 +3,21 @@ package com.mj147.tictactoeai.service;
 import com.mj147.tictactoeai.domain.Move;
 
 import java.util.List;
+import java.util.Set;
 
 public interface MoveService {
 
-    List<Move> findMovesWithBiggestFactor(String symbol);
+    List<Move> findMovesWithBiggestFactor(Set<String> boardSymbols);
 
-    List<Move> findMovesByBoardSymbol(String symbol);
+    List<Move> findMovesByBoardSymbols(Set<String> boardSymbols);
 
-    Move createMove(String symbol, Integer number, Integer moveValue);
+    List<Move> findMovesByBoardSymbolsAndFactor(Set<String> boardSymbols, Integer line);
+
+    Move createMove(String boardSymbol, Integer moveValue);
 
     Move update(Move move);
 
-    Boolean existsMoveByBoardSymbolAndSquareNumber(String symbol, Integer squareNumber);
+    Boolean isBoardSymbolExists(String symbol);
 
     List<Move> findAllByUpdate(Boolean update);
 }

@@ -12,7 +12,7 @@ public class Move {
     private Long id;
     private String boardSymbol;
     private Integer moveValue;
-    private Integer squareNumber;
-    private Long factor = 0L;
+    private Integer factor = 0;
     private Boolean update;
+
 }
