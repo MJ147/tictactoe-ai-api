@@ -1,6 +1,7 @@
 package com.mj147.tictactoeai.utils;
 
-import com.mj147.tictactoeai.domain.*;
+import com.mj147.tictactoeai.domain.Board;
+import com.mj147.tictactoeai.domain.Square;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -114,7 +115,7 @@ public class MoveConverter {
                 return true;
             }
             if (countZeros(String.valueOf(sb.charAt(1)) + sb.charAt(2) + sb.charAt(5)) == countZeros(String.valueOf(sb.charAt(3)) + sb.charAt(6) + sb.charAt(7)) &&
-                    ((int)sb.charAt(1) + (int)sb.charAt(2) + (int)sb.charAt(5)) < ((int)sb.charAt(3) + (int)sb.charAt(6) + (int)sb.charAt(7))) {
+                    ((int) sb.charAt(1) + (int) sb.charAt(2) + (int) sb.charAt(5)) < ((int) sb.charAt(3) + (int) sb.charAt(6) + (int) sb.charAt(7))) {
                 return true;
             }
 
@@ -123,7 +124,7 @@ public class MoveConverter {
         return false;
     }
 
-    public static int countZeros(String value){
+    public static int countZeros(String value) {
         StringBuilder sb = new StringBuilder(value);
         int counter = 0;
         for (int i = 0; i < sb.length(); i++) {
@@ -137,7 +138,7 @@ public class MoveConverter {
     public static String convertBoardToString(Board board) {
         List<Square> squares = board.getSquares();
         String stringSquares = squares.stream()
-                .map( s -> Integer.toString(s.getValue()))
+                .map(s -> Integer.toString(s.getValue()))
                 .collect(Collectors.joining());
         return stringSquares;
     }

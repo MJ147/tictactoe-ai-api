@@ -13,11 +13,19 @@ public interface MoveService {
 
     List<Move> findMovesByBoardSymbolsAndFactor(Set<String> boardSymbols, Integer line);
 
+    Long countMoveByFactorGreaterThan(Integer line);
+
     Move createMove(String boardSymbol, Integer moveValue);
 
     Move update(Move move);
 
+    void deleteAll();
+
     Boolean isBoardSymbolExists(String symbol);
 
     List<Move> findAllByUpdate(Boolean update);
+
+    void saveMovesToCsv(String fileName);
+
+    Long loadMovesFromCsv(String fileName);
 }
