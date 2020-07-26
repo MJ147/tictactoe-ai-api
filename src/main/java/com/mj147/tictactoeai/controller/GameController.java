@@ -2,8 +2,8 @@ package com.mj147.tictactoeai.controller;
 
 import com.mj147.tictactoeai.controller.dto.BoardDto;
 import com.mj147.tictactoeai.controller.dto.GameDto;
-import com.mj147.tictactoeai.controller.dto.SquareDto;
 import com.mj147.tictactoeai.service.GameService;
+import com.mj147.tictactoeai.service.MoveService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,8 +11,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.time.LocalTime;
-import java.time.Period;
 
 @RestController
 @RequestMapping("/game")
@@ -20,6 +18,8 @@ public class GameController {
 
     @Autowired
     GameService gameService;
+    @Autowired
+    MoveService moveService;
 
     @CrossOrigin(origins = "http://localhost:4200")
     @PostMapping("/create")
@@ -61,9 +61,9 @@ public class GameController {
     }
 
     @CrossOrigin(origins = "http://localhost:4200")
-    @PutMapping("/move/{squareId}")
-    public ResponseEntity<BoardDto> makeMove(@PathVariable Long squareId) {
-        BoardDto boardDto = new BoardDto(gameService.makeMove(squareId));
+    @PutMapping("/move")
+    public ResponseEntity<BoardDto> makeMove(@RequestParam() Long squareId, @RequestParam() Boolean isAiPlayer) {
+        BoardDto boardDto = new BoardDto(gameService.makeMove(squareId, isAiPlayer));
 
         return ResponseEntity.ok(boardDto);
     }
@@ -77,6 +77,20 @@ public class GameController {
         Duration timeElapsed = Duration.between(start, end);
         System.out.println("Time taken: " + timeElapsed);
         return HttpStatus.OK;
+    }
+
+    @CrossOrigin(origins = "http://localhost:4200")
+    @GetMapping("/save")
+    public HttpStatus saveMovesToCsv(@RequestParam String fileName) {
+        moveService.saveMovesToCsv(fileName);
+        return HttpStatus.OK;
+    }
+
+    @CrossOrigin(origins = "http://localhost:4200")
+    @PostMapping("/load")
+    public ResponseEntity<Long> loadMovesFromCsv(@RequestParam String fileName) {
+        Long numberOfMoves = moveService.loadMovesFromCsv(fileName);
+        return ResponseEntity.ok(numberOfMoves);
     }
 
 }

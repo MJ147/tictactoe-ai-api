@@ -14,5 +14,4 @@ public class Move {
     private Integer moveValue;
     private Integer factor = 0;
     private Boolean update;
-
 }

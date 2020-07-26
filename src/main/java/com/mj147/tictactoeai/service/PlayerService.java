@@ -9,4 +9,10 @@ public interface PlayerService {
     Player createPlayer(int squareValue);
 
     Player whoseTurn(Square square);
+
+    Square makeRandomMove(Board board);
+
+    Square makeMove(Board board, Player player);
+
+    void updateFactors(Player player, Integer checkIfWon);
 }

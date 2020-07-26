@@ -11,5 +11,4 @@ public class Player {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private Integer value;
-
 }

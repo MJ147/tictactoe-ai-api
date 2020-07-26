@@ -7,10 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.NoSuchElementException;
 
 @Service
 public class GameServiceImpl implements GameService {
@@ -22,8 +20,6 @@ public class GameServiceImpl implements GameService {
     @Autowired
     PlayerService playerService;
     @Autowired
-    AiPlayerService aiPlayerService;
-    @Autowired
     SquareService squareService;
     @Autowired
     MoveService moveService;
@@ -33,7 +29,7 @@ public class GameServiceImpl implements GameService {
         Game game = new Game();
         gameRepository.save(game);
         Player player1 = playerService.createPlayer(1);
-        AiPlayer player2 = aiPlayerService.createAiPlayer(2);
+        Player player2 = playerService.createPlayer(2);
         game.setPlayers(Arrays.asList(player1, player2));
         Board board = new Board();
         board.setGame(game);
@@ -67,7 +63,7 @@ public class GameServiceImpl implements GameService {
     }
 
     @Override
-    public Board makeMove(Long squareId) {
+    public Board makeMove(Long squareId, Boolean isAiPlayer) {
         Square square = squareService.findById(squareId);
         squareService.isSquareFree(square);
         Player player = playerService.whoseTurn(square);
@@ -75,13 +71,13 @@ public class GameServiceImpl implements GameService {
         squareService.updateSquare(square);
         Player player2 = playerService.whoseTurn(square);
         Board board = square.getBoard();
-        if (player2 instanceof AiPlayer && checkIfWon(board.getId()) == 0) {
-            Square square2 = aiPlayerService.makeMove(board, (AiPlayer) player2);
+        if (isAiPlayer && checkIfWon(board.getId()) == 0) {
+            Square square2 = playerService.makeMove(board, player2);
             square2.setValue(player2.getValue());
             squareService.updateSquare(square2);
         }
         if (checkIfWon(board.getId()) != 0) {
-            aiPlayerService.updateFactors(player2, checkIfWon(board.getId()));
+            playerService.updateFactors(player2, checkIfWon(board.getId()));
         }
 
         return square.getBoard();
@@ -96,45 +92,42 @@ public class GameServiceImpl implements GameService {
     @Override
     public void learnAi(Long gameId, Long numberOfGames) {
         Game game = this.getGame(gameId);
-        AiPlayer player = (AiPlayer) game.getPlayers().stream()
-                .filter(p -> p instanceof AiPlayer)
-                .findFirst()
-                .orElseThrow(NoSuchElementException::new);
+        Player player = game.getPlayers().get(1);
         Board board = game.getBoard();
         boardService.resetBoard(board.getId());
         simulateGames(board, player, numberOfGames);
     }
 
-    private void simulateGames(Board board, AiPlayer player, Long numberOfGames) {
+    private void simulateGames(Board board, Player player, Long numberOfGames) {
         for (int i = 0; i < numberOfGames; i++) {
             simulateOneGame(board, player);
         }
     }
 
     @Transactional
-    public void simulateOneGame(Board board, AiPlayer player) {
+    public void simulateOneGame(Board board, Player player) {
         while (checkIfWon(board.getId()) == 0) {
-            simulateRandomMove(board, player);
-            if (checkIfWon(board.getId()) != 0) {
-                break;
-            }
+//            simulateRandomMove(board, player);
+//            if (checkIfWon(board.getId()) != 0) {
+//                break;
+//            }
             simulateOneMove(board, player);
         }
         player.setValue(2);
-        aiPlayerService.updateFactors(player, checkIfWon(board.getId()));
+        playerService.updateFactors(player, checkIfWon(board.getId()));
         boardService.resetBoard(board.getId());
     }
 
-    private void simulateOneMove(Board board, AiPlayer player) {
+    private void simulateOneMove(Board board, Player player) {
         player.setValue(player.getValue() == 1 ? 2 : 1);
-        Square square = aiPlayerService.makeMove(board, player);
+        Square square = playerService.makeMove(board, player);
         square.setValue(player.getValue());
         squareService.updateSquare(square);
     }
 
-    private void simulateRandomMove(Board board, AiPlayer player) {
+    private void simulateRandomMove(Board board, Player player) {
         player.setValue(player.getValue() == 1 ? 2 : 1);
-        Square square = aiPlayerService.makeRandomMove(board, player);
+        Square square = playerService.makeRandomMove(board);
         square.setValue(player.getValue());
         squareService.updateSquare(square);
     }

@@ -2,9 +2,6 @@ package com.mj147.tictactoeai.service;
 
 import com.mj147.tictactoeai.domain.Board;
 import com.mj147.tictactoeai.domain.Game;
-import com.mj147.tictactoeai.domain.Square;
-
-import java.util.List;
 
 public interface GameService {
 
@@ -16,9 +13,10 @@ public interface GameService {
 
     Board resetBoard(Long boardId);
 
-    Board makeMove(Long squareId);
+    Board makeMove(Long squareId, Boolean isAiPlayer);
 
-    Integer checkIfWon (Long boardId);
+    Integer checkIfWon(Long boardId);
 
     void learnAi(Long gameId, Long numberOfGames);
+
 }
