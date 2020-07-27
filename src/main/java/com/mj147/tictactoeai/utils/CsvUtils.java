@@ -20,7 +20,7 @@ public class CsvUtils {
     private static final String UPDATE = "Update";
 
     public static void covertModelToCsv(List<Move> moves, String fileName) throws IOException {
-        BufferedWriter out = Files.newBufferedWriter(Paths.get("src\\main\\resources\\" + fileName));
+        BufferedWriter out = Files.newBufferedWriter(Paths.get(fileName));
         CSVPrinter printer = CSVFormat.DEFAULT
                 .withHeader(ID, BOARD_SYMBOL, FACTOR, MOVE_VALUE, UPDATE)
                 .print(out);
@@ -32,7 +32,7 @@ public class CsvUtils {
 
     public static List<Move> covertCsvToModel(String fileName) throws IOException {
         List<Move> moves = new ArrayList<>();
-        BufferedReader in = new BufferedReader(new FileReader("src\\main\\resources\\" + fileName));
+        BufferedReader in = new BufferedReader(new FileReader(fileName));
         Iterable<CSVRecord> records = CSVFormat.DEFAULT
                 .withHeader(ID, BOARD_SYMBOL, FACTOR, MOVE_VALUE, UPDATE)
                 .withFirstRecordAsHeader()
