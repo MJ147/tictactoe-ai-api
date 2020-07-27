@@ -15,7 +15,7 @@ public class MoveController {
     @Autowired
     MoveService moveService;
 
-    @CrossOrigin(origins = "http://localhost:4200")
+    @CrossOrigin(origins = "https://tictactoe147.herokuapp.com/git")
     @DeleteMapping("/deleteAll")
     public HttpStatus createGame() {
         moveService.deleteAll();
