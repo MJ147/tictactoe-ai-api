@@ -10,7 +10,9 @@ The computer player instance was created using machine learning.
 * frontend part: https://github.com/MJ147/tictactoe-ai-frontend
 
 ## Screenshots
-https://github.com/MJ147/tictactoe-ai-frontend/blob/master/README.md
+![player vs player mode](https://raw.githubusercontent.com/MJ147/tictactoe-ai-frontend/master/screenshots/1.png)
+![player vs computer mode](https://github.com/MJ147/tictactoe-ai-frontend/raw/master/screenshots/2.png)
+![play example](https://github.com/MJ147/tictactoe-ai-frontend/raw/master/screenshots/3.png)
 
 ## Motivation
 A motivation for this project was to create a complete application with a computer player instance which will be learn how to play during game.
