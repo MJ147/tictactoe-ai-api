@@ -1,8 +1,8 @@
 # Tictactoe Ai Backend
-A backend part of tic-tac-toe application, using machine learning.
+The backend part of tic-tac-toe application, using machine learning.
 
 ## General info
-A backend part of application basic on classic tic-tac-toe game. The game has two modes: player vs player and player vs AI.
+The backend part of application basic on classic tic-tac-toe game. The game has two modes: player vs player and player vs AI.
 The computer player instance was created using machine learning.  
 
 ## Links
