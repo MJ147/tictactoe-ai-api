@@ -1,4 +1,4 @@
-# Tictactoe Ai Backend
+# Tictactoe Ai API
 The backend part of tic-tac-toe application, using machine learning.
 
 ## General info
